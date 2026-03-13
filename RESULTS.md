@@ -1,0 +1,175 @@
+# iOSMapsTest — MapLibre Build System Research Results
+
+## Date: 2026-03-12
+
+## MapLibre Native Repository Analysis
+
+Repository cloned to `~/Projects/maplibre-native` (shallow clone, HEAD of main branch).
+
+### OpenGL Build Flags Found
+
+The CMake build system supports four mutually exclusive rendering backends:
+
+- `MLN_WITH_OPENGL` (default: OFF)
+- `MLN_WITH_METAL` (default: OFF)
+- `MLN_WITH_VULKAN` (default: OFF)
+- `MLN_WITH_WEBGPU` (default: OFF)
+
+Exactly one must be enabled. Validation in `cmake/validate-backend-options.cmake`.
+
+When `MLN_WITH_OPENGL=ON`, `cmake/opengl.cmake` configures:
+- Compile definition: `MLN_RENDER_BACKEND_OPENGL=1`
+- Full set of GL renderer source files in `src/mbgl/gl/` (~30+ .cpp files)
+- GL shader implementations in `src/mbgl/shaders/gl/`
+- Drawable renderer GL sources
+
+The OpenGL renderer is actively maintained -- it has shader files, buffer allocators,
+texture management, and the full drawable pipeline, not just stubs.
+
+### CMake Presets Available
+
+Presets: ios, ios-metal, ios-webgpu-dawn, ios-webgpu-wgpu, macos, macos-metal,
+macos-metal-xcode, macos-vulkan, macos-vulkan-xcode, macos-metal-node,
+macos-webgpu-dawn, macos-webgpu-wgpu, linux, linux-opengl, linux-vulkan,
+linux-webgpu-dawn, linux-webgpu-wgpu, android-webgpu-dawn, android-webgpu-wgpu,
+linux-opengl-node, windows, windows-opengl, windows-opengl-node, windows-egl,
+windows-vulkan, windows-arm64, windows-arm64-opengl, windows-arm64-opengl-node,
+windows-arm64-vulkan.
+
+**No `ios-opengl` preset exists.** OpenGL presets are only provided for Linux and Windows.
+However, the `ios` base preset can theoretically be inherited with `MLN_WITH_OPENGL=ON`.
+
+### Bazel Renderer Configs
+
+Bazel has a `config_setting` named `:drawable_renderer` which selects OpenGL sources:
+- `MLN_OPENGL_SOURCE`, `MLN_DRAWABLES_GL_SOURCE` compiled
+- `MLN_OPENGL_HEADERS`, `MLN_DRAWABLES_GL_HEADERS` included
+
+iOS Bazel files (`platform/ios/bazel/files.bzl`) explicitly list:
+- `MLN_IOS_PUBLIC_OBJCPP_OPENGL_SOURCE = ["src/MLNMapView+OpenGL.mm"]`
+- `src/MLNMapView+OpenGL.h` in private headers
+
+### OpenGL ES Version Requirements
+
+**MapLibre requires OpenGL ES 3.0.** Evidence:
+
+1. `platform/ios/src/MLNMapView+OpenGL.mm:113` creates an ES3 context:
+   `resource.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3]`
+
+2. `platform/darwin/src/headless_backend_eagl.mm` also uses `kEAGLRenderingAPIOpenGLES3`
+
+3. All GLSL shaders use `#version 300 es` (see `src/mbgl/shaders/gl/shader_program_gl.cpp:126`
+   and `src/mbgl/shaders/gl/legacy/program_base.hpp:59`)
+
+4. Uses ES 3.0 functions like `glMapBufferRange` (in `src/mbgl/gl/buffer_allocator.cpp`)
+
+### iOS Simulator OpenGL ES 3.0 Support
+
+The iOS Simulator SDK includes ES3 headers:
+- `OpenGLES.framework/Headers/ES3/` directory exists
+- `kEAGLRenderingAPIOpenGLES3 = 3` is defined in `EAGL.h`
+- GLKit.framework is present
+
+SDK path: `iPhoneSimulator.sdk/System/Library/Frameworks/OpenGLES.framework/`
+
+**Runtime question:** Whether `EAGLContext initWithAPI:kEAGLRenderingAPIOpenGLES3` succeeds
+at runtime in a QEMU VM is unknown. Apple deprecated OpenGL ES in iOS 12 but the framework
+remains. The iOS Simulator uses software rendering (not GPU), and Apple's software renderer
+historically supports ES 3.0 on x86_64 simulators. Our VM runs x86_64 macOS, so the
+simulator should use the same software renderer.
+
+### iOS Platform Build Files
+
+The iOS build uses `platform/ios/ios.cmake` which:
+- Filters source files based on renderer backend
+- When NOT Metal/WebGPU (i.e., OpenGL): keeps OpenGL files, excludes Metal/WebGPU
+- Links frameworks: CoreText, CoreImage, CoreGraphics, QuartzCore, UIKit, ImageIO
+- Does NOT explicitly link OpenGLES or GLKit (these must be added)
+
+**Critical dependency:** `platform/darwin/darwin.cmake` requires Bazel:
+`find_program(BAZEL bazel REQUIRED)` -- needed to generate Darwin style code
+(`MLNBackgroundStyleLayer.mm`, etc.) via `bazel build //platform/darwin:generated_code`.
+The CMake build requires Bazel as a prerequisite.
+
+### Tool Availability on VM
+
+| Tool | Status |
+|------|--------|
+| CMake | NOT INSTALLED (not in PATH, not in Xcode.app) |
+| Bazel | NOT INSTALLED |
+| Ninja | NOT INSTALLED |
+| ccache | NOT INSTALLED |
+| Homebrew | NOT INSTALLED |
+| Xcode | 16.2 installed |
+| Disk space | 144 GB free |
+| RAM/CPU | 32 GB / 12 cores |
+
+### Submodule Dependencies
+
+The repo uses git submodules for vendors (not initialized in shallow clone):
+boost, freetype, harfbuzz, googletest, glslang, etc.
+`git submodule update --init --recursive` would be needed.
+
+## Assessment
+
+### Path A (CMake) Viability
+
+**BLOCKED without significant setup.** Requirements:
+1. Install CMake >= 3.25 (repo requirement)
+2. Install Bazel (required by darwin.cmake for code generation)
+3. Install Ninja (used by most presets, though Xcode generator works too)
+4. Initialize git submodules
+5. Create a custom `ios-opengl` preset (none exists)
+
+Without Homebrew, installing CMake and Bazel is non-trivial. CMake could be installed
+from the official `.dmg` installer. Bazel requires a more involved installation.
+
+The CMake path also has a chicken-and-egg problem: it needs Bazel to generate code, so
+you effectively need both build systems.
+
+### Path B (Bazel) Viability
+
+**More promising but still needs Bazel installed.** The Bazel build:
+- Has explicit iOS OpenGL support (files.bzl lists OpenGL sources)
+- Does not depend on CMake
+- Handles code generation natively
+- Has a `drawable_renderer` config for OpenGL
+
+Installation: Bazel can be installed via the official binary release (no Homebrew needed).
+Bazelisk (a Bazel wrapper) is a single binary download.
+
+### Hard Blockers
+
+1. **No build tools installed.** Neither CMake nor Bazel is available on the VM. Homebrew
+   is not installed, making tool installation harder (but not impossible via direct downloads).
+
+2. **ES 3.0 runtime support is unverified.** The headers exist, but whether `EAGLContext`
+   with ES 3.0 actually works at runtime in the QEMU simulator is unknown. This can only
+   be tested after building a test binary. If the software renderer does not support ES 3.0,
+   all GL shaders will fail (they require `#version 300 es`).
+
+3. **GLKit is deprecated.** MapLibre iOS OpenGL path uses `GLKView` and `GLKViewDelegate`,
+   which are deprecated since iOS 12 and may be removed in future Xcode versions. Currently
+   still present in Xcode 16.2 SDK.
+
+4. **Submodules not initialized.** The shallow clone does not include vendor dependencies.
+   A full `git submodule update --init --recursive` is needed (potentially large download).
+
+### No Absolute Blockers Found
+
+The OpenGL rendering path is maintained, the iOS platform has OpenGL source files, ES3
+headers exist in the simulator SDK. The main obstacles are tooling installation.
+
+### Recommended Next Steps
+
+1. **Quick ES 3.0 runtime test** -- Write a minimal ObjC test app that creates an
+   `EAGLContext` with `kEAGLRenderingAPIOpenGLES3` and checks if it returns nil. This can
+   be done with plain `xcodebuild` (no CMake/Bazel needed) and answers the critical question
+   of whether OpenGL ES 3.0 works in our QEMU simulator.
+
+2. **If ES 3.0 works:** Install Bazelisk (single binary, ~10MB) and attempt the Bazel build
+   with `--//:renderer=drawable` (OpenGL). The Bazel path is self-contained and does not need
+   CMake.
+
+3. **If ES 3.0 does not work:** The MapLibre OpenGL path is definitively blocked. Fall back
+   to the Leaflet.js/WKWebView approach used by FieldWalk.
