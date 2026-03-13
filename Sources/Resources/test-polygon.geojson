@@ -1,0 +1,22 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hawthorne District",
+        "description": "Test polygon — Portland, OR"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-122.6350, 45.5120],
+          [-122.6200, 45.5120],
+          [-122.6200, 45.5180],
+          [-122.6350, 45.5180],
+          [-122.6350, 45.5120]
+        ]]
+      }
+    }
+  ]
+}

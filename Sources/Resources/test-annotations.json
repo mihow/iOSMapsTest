@@ -1,0 +1,7 @@
+[
+  {"id": "obs-1", "title": "Western Tiger Swallowtail", "subtitle": "2024-06-15 · Count: 3", "latitude": 45.5135, "longitude": -122.6280},
+  {"id": "obs-2", "title": "Painted Lady", "subtitle": "2024-06-15 · Count: 1", "latitude": 45.5150, "longitude": -122.6250},
+  {"id": "obs-3", "title": "Monarch", "subtitle": "2024-07-02 · Count: 2", "latitude": 45.5165, "longitude": -122.6310},
+  {"id": "obs-4", "title": "Cabbage White", "subtitle": "2024-07-02 · Count: 5", "latitude": 45.5140, "longitude": -122.6330},
+  {"id": "obs-5", "title": "Anise Swallowtail", "subtitle": "2024-07-10 · Count: 1", "latitude": 45.5175, "longitude": -122.6270}
+]
