@@ -20,6 +20,13 @@ struct iOSMapsTestApp: App {
             .overlay(alignment: .bottom) {
                 DiagnosticsOverlay()
             }
+            .onAppear {
+                print("=== GPU CAPABILITIES ===")
+                print("Metal: \(diagnostics.metalAvailable)")
+                print("OpenGL ES 2.0: \(diagnostics.openGLES2Available)")
+                print("OpenGL ES 3.0: \(diagnostics.openGLES3Available)")
+                print("========================")
+            }
         }
     }
 }

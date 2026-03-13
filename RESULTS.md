@@ -173,3 +173,81 @@ headers exist in the simulator SDK. The main obstacles are tooling installation.
 
 3. **If ES 3.0 does not work:** The MapLibre OpenGL path is definitively blocked. Fall back
    to the Leaflet.js/WKWebView approach used by FieldWalk.
+
+---
+
+## Runtime OpenGL ES Test — 2026-03-13
+
+### Test Setup
+
+A minimal Swift SPM project (`~/Projects/GLTest`) was created with a single `main.swift`
+that calls `EAGLContext(api: .openGLES2)` and `EAGLContext(api: .openGLES3)` and prints
+the results. No MapLibre dependency — tests only the iOS Simulator OpenGL ES runtime.
+
+Built with:
+```
+xcodebuild -scheme GLTest -sdk iphonesimulator \
+  -destination "platform=iOS Simulator,name=iPhone SE (3rd generation)" build
+```
+
+Launched with `xcrun simctl launch --console-pty` on iPhone SE (3rd generation) simulator
+running iOS 18.3.1 inside QEMU VM (macOS Sonoma, x86_64).
+
+### Results
+
+```
+=== GPU CAPABILITIES ===
+OpenGL ES 2.0: AVAILABLE
+OpenGL ES 3.0: AVAILABLE
+========================
+```
+
+### Interpretation
+
+- **Metal:** NOT tested in this run (not included in GLTest); expected false in QEMU (confirmed previously)
+- **OpenGL ES 2.0:** AVAILABLE — `EAGLContext(api: .openGLES2)` returns a non-nil context
+- **OpenGL ES 3.0:** AVAILABLE — `EAGLContext(api: .openGLES3)` returns a non-nil context
+
+### Go/No-Go Decision
+
+**GO.** OpenGL ES 3.0 is available at runtime in the iOS Simulator running inside QEMU.
+
+The iOS Simulator uses Apples software renderer on x86_64, which supports ES 3.0 regardless
+---
+
+## Runtime OpenGL ES Test — 2026-03-13
+
+### Test Setup
+
+A minimal Swift SPM project (~/Projects/GLTest) was created with a single main.swift
+that calls EAGLContext(api: .openGLES2) and EAGLContext(api: .openGLES3) and prints
+the results. No MapLibre dependency — tests only the iOS Simulator OpenGL ES runtime.
+
+Built with xcodebuild -scheme GLTest -sdk iphonesimulator and launched via
+xcrun simctl launch --console-pty on iPhone SE (3rd generation) running iOS 18.3.1
+inside QEMU VM (macOS Sonoma, x86_64).
+
+### Results
+
+=== GPU CAPABILITIES ===
+OpenGL ES 2.0: AVAILABLE
+OpenGL ES 3.0: AVAILABLE
+========================
+
+### Interpretation
+
+- Metal: NOT tested here; expected false in QEMU (confirmed previously)
+- OpenGL ES 2.0: AVAILABLE — EAGLContext(api: .openGLES2) returns a non-nil context
+- OpenGL ES 3.0: AVAILABLE — EAGLContext(api: .openGLES3) returns a non-nil context
+
+### Go/No-Go Decision
+
+GO. OpenGL ES 3.0 is available at runtime in the iOS Simulator running inside QEMU.
+
+The iOS Simulator uses Apple software renderer on x86_64, which supports ES 3.0
+regardless of whether the host GPU supports Metal. This confirms that MapLibre requirement
+for kEAGLRenderingAPIOpenGLES3 (MLNMapView+OpenGL.mm:113) will be satisfied.
+
+### Next Step
+
+Proceed with Task 9: Install Bazelisk and attempt the Bazel OpenGL build of maplibre-native.
