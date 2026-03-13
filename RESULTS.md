@@ -251,3 +251,105 @@ for kEAGLRenderingAPIOpenGLES3 (MLNMapView+OpenGL.mm:113) will be satisfied.
 ### Next Step
 
 Proceed with Task 9: Install Bazelisk and attempt the Bazel OpenGL build of maplibre-native.
+
+---
+
+## Bazel Build — MapLibre Static XCFramework (OpenGL) — 2026-03-13
+
+### Bazelisk Installation
+
+Installed Bazelisk (Bazel launcher) as a standalone binary:
+```bash
+curl -L -o /tmp/bazel https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-darwin-amd64
+chmod +x /tmp/bazel
+sudo mv /tmp/bazel /usr/local/bin/bazel
+```
+
+Bazelisk downloaded Bazel 9.0.1 on first run. Verified: `bazel --version` -> `bazel 9.0.1`.
+
+### Submodule Initialization
+
+The shallow clone was missing vendor submodules. Fixed with:
+```bash
+cd ~/Projects/maplibre-native
+git submodule update --init --recursive
+```
+
+This cloned all vendor dependencies (boost, freetype, harfbuzz, googletest, etc.).
+
+### Build Attempt 1 — Failed
+
+```bash
+bazel build //platform/ios:MapLibre.static --//:renderer=drawable
+```
+
+Failed after ~3 minutes during analysis phase:
+- `vendor/BUILD.bazel` glob for `cheap-ruler-cpp` headers failed (submodules not initialized)
+- `vendor/maplibre-tile-spec/cpp` BUILD file not found
+
+**Root cause:** Shallow clone did not include git submodules.
+
+### Build Attempt 2 — SUCCESS
+
+After initializing submodules, re-ran the same command:
+```bash
+bazel build //platform/ios:MapLibre.static --//:renderer=drawable
+```
+
+**Result: BUILD COMPLETED SUCCESSFULLY**
+
+Key metrics:
+- Total time: 3028 seconds (~50 minutes)
+- Critical path: 190 seconds
+- Total actions: 2,382 (226 internal, 1,882 darwin-sandbox, 274 local)
+- All 12 CPU cores utilized (12 actions running concurrently)
+
+### Output Artifact
+
+**Location:** `bazel-bin/platform/ios/MapLibre.static.xcframework.zip` (85 MB)
+
+Unzipped structure:
+```
+MapLibre.xcframework/
+├── Info.plist
+├── ios-arm64/
+│   └── MapLibre.framework/
+│       ├── Headers/ (87 headers)
+│       ├── MapLibre (static library, arm64)
+│       ├── Mapbox.bundle/
+│       └── Modules/
+└── ios-arm64_x86_64-simulator/
+    └── MapLibre.framework/
+        ├── Headers/ (87 headers + 2 umbrella)
+        ├── MapLibre (fat static library, 409 MB, x86_64 + arm64)
+        ├── Info.plist
+        ├── Mapbox.bundle/
+        └── Modules/
+```
+
+Total public headers: 174
+
+Architecture verification:
+```
+$ lipo -info MapLibre.xcframework/ios-arm64_x86_64-simulator/MapLibre.framework/MapLibre
+Architectures in the fat file: x86_64 arm64
+```
+
+### Renderer Confirmation
+
+The `--//:renderer=drawable` flag selects the OpenGL (drawable) renderer. This is actually
+the default value in `BUILD.bazel` (`build_setting_default = "drawable"`), but was specified
+explicitly for clarity. The build included:
+- `MLN_OPENGL_SOURCE` + `MLN_DRAWABLES_GL_SOURCE` (core OpenGL renderer)
+- `MLN_IOS_PUBLIC_OBJCPP_OPENGL_SOURCE` = `MLNMapView+OpenGL.mm` (iOS OpenGL integration)
+
+No Metal sources were compiled (`//:metal_renderer` was not selected).
+
+### XCFramework Copied
+
+The xcframework has been copied to `~/Projects/iOSMapsTest/MapLibre.xcframework/`
+and the zip to `~/Projects/iOSMapsTest/MapLibre.static.xcframework.zip`.
+
+### Next Step
+
+Proceed with Task 10: Integrate the OpenGL xcframework into the iOSMapsTest Swift project.
