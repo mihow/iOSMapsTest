@@ -338,6 +338,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\".\"",
@@ -355,6 +356,8 @@
 		6E0C524AB4D94EFCEBA16AC8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.iOSMapsTestTests;
 				PRODUCT_NAME = iOSMapsTestTests;
 				SWIFT_VERSION = 5.0;
@@ -365,6 +368,8 @@
 		D7BD27D9A3B261C6C60B2CA6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.iOSMapsTestTests;
 				PRODUCT_NAME = iOSMapsTestTests;
 				SWIFT_VERSION = 5.0;
@@ -376,6 +381,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\".\"",

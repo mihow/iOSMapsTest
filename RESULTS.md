@@ -27,8 +27,8 @@ For iOS apps targeting QEMU simulator testing, use **MapLibre GL with the OpenGL
 
 ```bash
 # One-command build, install, launch
-ssh macos-vm "bash ~/Projects/iOSMapsTest/scripts/build.sh"
+bash scripts/build.sh
 
-# MapLibre xcframework was built with:
-# cd ~/Projects/maplibre-native && bazel build //platform/ios:MapLibre.static --//:renderer=drawable
+# MapLibre xcframework was built with (in a maplibre-native checkout):
+# bazel build //platform/ios:MapLibre.static --//:renderer=drawable
 ```

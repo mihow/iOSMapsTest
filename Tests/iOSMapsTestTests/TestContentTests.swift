@@ -16,7 +16,7 @@ struct TestContentTests {
         let data = TestContent.loadPolygonGeoJSON()
         #expect(data != nil)
         let str = String(data: data!, encoding: .utf8)!
-        #expect(str.contains("Hawthorne"))
+        #expect(str.contains("Mt. Hood"))
     }
 
     @Test("Center coordinate is Portland")

@@ -44,6 +44,7 @@ targets:
       CURRENT_PROJECT_VERSION: "1"
       MARKETING_VERSION: "1.0"
       PRODUCT_NAME: iOSMapsTest
+      ENABLE_TESTABILITY: YES
 
   iOSMapsTestTests:
     type: bundle.unit-test
@@ -55,3 +56,16 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.example.iOSMapsTestTests
       SWIFT_VERSION: "5.0"
       PRODUCT_NAME: iOSMapsTestTests
+      GENERATE_INFOPLIST_FILE: YES
+      TEST_HOST: "$(BUILT_PRODUCTS_DIR)/iOSMapsTest.app/iOSMapsTest"
+      BUNDLE_LOADER: "$(TEST_HOST)"
+
+schemes:
+  iOSMapsTest:
+    build:
+      targets:
+        iOSMapsTest: all
+        iOSMapsTestTests: [test]
+    test:
+      targets:
+        - iOSMapsTestTests

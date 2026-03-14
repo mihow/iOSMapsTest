@@ -1,36 +1,72 @@
 # iOSMapsTest — Agent Rules
 
-## Purpose
-Test harness comparing map rendering backends in QEMU iOS Simulator (no Metal GPU).
-This is a research/dev tool, not a shipping app.
+## What This Is
 
-## Swift Rules
-- Swift 6 strict concurrency; async/await for all async ops
-- Prefer structs over classes
-- @Observable for shared state (DiagnosticsLog)
-- Never force unwrap (!)
-- Extract views > 100 lines into separate files
+Test harness comparing 4 map rendering backends in a QEMU iOS Simulator (no Metal GPU).
+Research/dev tool, not a shipping app.
 
-## Project Rules
-- SPM-based — no .xcodeproj
-- Simulator builds only — no code signing
-- Bundle ID: com.example.iOSMapsTest
-- Build: `bash scripts/build.sh`
-- Screenshots: `bash scripts/test_screens.sh`
+## Project Structure
+
+- **Build system:** xcodeproj via [xcodegen](https://github.com/yonaskolb/XcodeGen) (`project.yml`)
+- **Bundle ID:** `com.example.iOSMapsTest`
+- **Min iOS:** 17.0
+- **Swift:** 5.0
+
+## Tabs (4 backends)
+
+| Tab | File | Backend |
+|-----|------|---------|
+| MapKit | `MapKitTab.swift` | MKMapView (blank in QEMU) |
+| MK+Overlay | `MapKitOverlayTab.swift` | MKMapView + MKTileOverlay (blank in QEMU) |
+| MapLibre GL | `MapLibreMetalTab.swift` | MapLibre OpenGL ES via static xcframework |
+| Leaflet | `LeafletTab.swift` | WKWebView + Leaflet.js |
+
+**Note:** `MapLibreMetalTab.swift` is a misnomer from early development — it uses the OpenGL drawable renderer, not Metal.
 
 ## Architecture
-- TabView with one tab per map backend
-- Each tab is independent — no shared MapRenderer protocol
-- DiagnosticsLog is @Observable, shared via .environment()
-- Backends: MapKit, MapKit+TileOverlay, MapLibre(Metal/SPM), Leaflet(WKWebView), MapLibre(OpenGL — Phase 2)
 
-## Testing
-- Unit tests for DiagnosticsLog and TestContent models
-- Visual testing via screenshot tour (scripts/test_screens.sh)
-- Run tests: xcodebuild -scheme iOSMapsTest -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone SE (3rd generation)" test
+- `iOSMapsTestApp.swift` — TabView, defaults to MapLibre GL tab
+- `DiagnosticsLog` — `@Observable` model, shared via `.environment()`, tracks GPU capabilities + log entries
+- `TestContent` — shared coordinates (Portland, OR), OSM tile URL, GeoJSON loaders
+- Each tab is self-contained — no shared map protocol
 
-## Key Constraint
-- MKMapView does NOT render in QEMU (Metal unavailable)
-- MapLibre SPM (Metal binary) also expected to fail
-- Leaflet/WKWebView is the known-working reference
-- MapLibre OpenGL build (Phase 2) is the primary experiment
+## Commands
+
+```bash
+# Build, install, launch on simulator
+bash scripts/build.sh
+
+# Regenerate xcodeproj after editing project.yml
+xcodegen generate
+
+# Run tests
+xcodebuild -project iOSMapsTest.xcodeproj \
+  -scheme iOSMapsTest \
+  -sdk iphonesimulator \
+  -destination "platform=iOS Simulator,name=iPhone SE (3rd generation)" \
+  test
+```
+
+## MapLibre xcframework
+
+Not checked into git (617 MB). Must be built from source or downloaded:
+
+```bash
+# In a maplibre-native checkout (with submodules):
+bazel build //platform/ios:MapLibre.static --//:renderer=drawable
+# Extract to: MapLibre.xcframework/ in project root
+```
+
+## Dependencies
+
+- [MapLibre Native](https://github.com/maplibre/maplibre-native) — OpenGL static xcframework (local, not SPM)
+- [Leaflet.js](https://leafletjs.com/) 1.9.4 — loaded from CDN in `leaflet.html`
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen) — generates `.xcodeproj` from `project.yml`
+
+## Rules
+
+- No personal paths, credentials, or VM-specific references in code
+- Keep each tab self-contained
+- Prefer structs over classes
+- `@Observable` for shared state
+- No force unwraps

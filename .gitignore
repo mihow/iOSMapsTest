@@ -1,9 +1,18 @@
+# Xcode
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.app
+
+# Build artifacts
+.build/
+*.ipa
+
+# MapLibre xcframework (too large for git — build from source)
 MapLibre.static.xcframework.zip
 MapLibre.xcframework/
 
-# Xcode
-*.xcodeproj/xcuserdata/
-*.xcodeproj/project.xcworkspace/xcuserdata/
-DerivedData/
-.build/
-iOSMapsTest.app/
+# macOS
+.DS_Store
+*.swp
+*~

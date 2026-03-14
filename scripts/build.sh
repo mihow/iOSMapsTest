@@ -1,14 +1,41 @@
 #!/bin/bash
 set -e
-DEVICE_ID="6CAD5AE3-6BA8-45D2-AFAA-9833A3C0B62C"
+
 BUNDLE_ID="com.example.iOSMapsTest"
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
-echo "=== Building iOSMapsTest ==="
+# Find a booted simulator, or fall back to first available iPhone SE
+DEVICE_ID=$(xcrun simctl list devices booted -j 2>/dev/null | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for runtime, devices in data.get('devices', {}).items():
+    for d in devices:
+        if d.get('state') == 'Booted':
+            print(d['udid']); sys.exit(0)
+" 2>/dev/null)
+
+if [ -z "$DEVICE_ID" ]; then
+    echo "No booted simulator found. Booting iPhone SE..."
+    DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for runtime, devices in data.get('devices', {}).items():
+    for d in devices:
+        if 'iPhone SE' in d.get('name', '') and d.get('isAvailable'):
+            print(d['udid']); sys.exit(0)
+")
+    if [ -z "$DEVICE_ID" ]; then
+        echo "ERROR: No iPhone SE simulator found."
+        exit 1
+    fi
+    xcrun simctl boot "$DEVICE_ID"
+fi
+
+echo "=== Building iOSMapsTest (simulator: $DEVICE_ID) ==="
 xcodebuild -project "$PROJECT_DIR/iOSMapsTest.xcodeproj" \
   -scheme iOSMapsTest \
   -sdk iphonesimulator \
-  -destination "platform=iOS Simulator,name=iPhone SE (3rd generation)" \
+  -destination "id=$DEVICE_ID" \
   build 2>&1 | tail -5
 
 APP=$(find ~/Library/Developer/Xcode/DerivedData/iOSMapsTest-*/Build/Products/Debug-iphonesimulator/ \
