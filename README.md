@@ -1,23 +1,25 @@
-# iOSMapsTest
+# ios-maps-without-metal
 
-Test harness comparing 4 map rendering backends in a QEMU iOS Simulator where Metal GPU is unavailable.
+Test harness comparing 4 map rendering backends in an iOS Simulator where Metal GPU is unavailable.
 
 ## Why
 
-macOS VMs running under QEMU/KVM (Docker-OSX, UTM, etc.) lack Metal GPU support. This makes Apple's MapKit unusable — `MKMapView` renders as a blank beige rectangle. This project tests which map SDKs still work in that environment.
+macOS VMs (QEMU/KVM, Proxmox, VirtualBox, Docker-OSX, UTM) typically lack Metal GPU support. This makes Apple's MapKit unusable — `MKMapView` renders as a blank beige rectangle. CI runners without GPU access hit the same problem. This project tests which map SDKs still work without Metal.
 
 ## Results
 
-| Backend | Renders in QEMU? | Renderer | Notes |
+| Backend | Renders without Metal? | Renderer | Notes |
 |---------|:-:|----------|-------|
-| MapKit | No | Metal (required) | Blank — Metal unavailable |
-| MapKit + MKTileOverlay | No | Metal (required) | Blank — MKMapView broken regardless of tile source |
-| **MapLibre GL** | **Yes** | OpenGL ES 3.0 | Built from source with OpenGL renderer |
+| MapKit | No | Metal (required) | Blank — no workaround, not even custom tile overlays |
+| MapKit + MKTileOverlay | No | Metal (required) | MKMapView rendering broken regardless of tile source |
+| **MapLibre GL** | **Yes** | OpenGL ES 3.0 | Must build from source with OpenGL renderer |
 | **Leaflet.js** | **Yes** | Software (WebKit) | WKWebView, no GPU dependency |
 
 All backends include a Mt. Hood National Forest polygon overlay and summit marker for feature comparison.
 
 ## Screenshots
+
+Tested on iOS 18.3.1 Simulator in a QEMU/KVM macOS Sonoma VM.
 
 | MapKit (blank) | MK+Overlay (blank) | MapLibre GL | Leaflet.js |
 |:-:|:-:|:-:|:-:|
@@ -25,16 +27,16 @@ All backends include a Mt. Hood National Forest polygon overlay and summit marke
 
 ## Key Findings
 
-1. **MKMapView requires Metal** — no workaround, not even custom tile overlays help
-2. **MapLibre GL works via OpenGL ES 3.0** — Apple's software OpenGL renderer is available in the QEMU simulator. MapLibre must be built from source with the `drawable` (OpenGL) renderer instead of the default Metal renderer
-3. **Leaflet.js via WKWebView works** — WebKit uses software rendering internally. Good for simple tile display but limited compared to native SDKs
-4. **OpenGL ES 3.0 is available** in the QEMU iOS Simulator despite no GPU
+1. **MKMapView requires Metal** — no workaround, not even custom tile overlays help. This affects any VM or CI environment without GPU access.
+2. **MapLibre GL works via OpenGL ES 3.0** — Apple's software OpenGL renderer is available in the iOS Simulator even without a GPU. MapLibre must be built from source with the `drawable` (OpenGL) renderer instead of the default Metal renderer.
+3. **Leaflet.js via WKWebView works** — WebKit uses software rendering internally. Good for simple tile display but limited compared to native SDKs.
+4. **OpenGL ES 3.0 is available** in the iOS Simulator without a GPU, via Apple's software renderer.
 
 ## Setup
 
 ### Prerequisites
 
-- macOS VM with Xcode installed
+- macOS (VM or bare metal) with Xcode installed
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen` or download binary)
 - MapLibre OpenGL xcframework (see below)
 - iOS Simulator with an iPhone device
@@ -53,7 +55,7 @@ git submodule update --init --recursive
 bazel build //platform/ios:MapLibre.static --//:renderer=drawable
 
 # Extract the xcframework
-unzip bazel-bin/platform/ios/MapLibre.static.xcframework.zip -d /path/to/iOSMapsTest/
+unzip bazel-bin/platform/ios/MapLibre.static.xcframework.zip -d /path/to/ios-maps-without-metal/
 ```
 
 Build takes ~50 minutes. The output is a static xcframework with x86_64 + arm64 simulator slices.
@@ -98,6 +100,18 @@ Sources/
     test-polygon.geojson         # Mt. Hood NF boundary
     test-annotations.json        # Sample point annotations
 ```
+
+## Applicability
+
+These findings apply to any environment where Metal is unavailable:
+
+- **QEMU/KVM** (Docker-OSX, UTM on Linux) — tested and confirmed
+- **Proxmox** without GPU passthrough — same QEMU backend
+- **VirtualBox** — no Metal support
+- **CI/CD runners** without GPU access
+- **VMware** — partial Metal via virtual GPU, results may vary
+
+Environments with Metal (bare metal Mac, GPU passthrough, cloud Mac instances) don't have this problem — MapKit works normally.
 
 ## License
 
