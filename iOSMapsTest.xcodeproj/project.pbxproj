@@ -17,6 +17,7 @@
 		9302ACFE872974301A7F37B2 /* test-polygon.geojson in Resources */ = {isa = PBXBuildFile; fileRef = EF41EACB3018FB71285BDF02 /* test-polygon.geojson */; };
 		B5732B3EBB6B8CFD1F86FA96 /* DiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA2C09708D186F49E0CCAF3F /* DiagnosticsView.swift */; };
 		BD7ACA84CE7A6D2697F60373 /* DiagnosticsLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D513E446C1494870E4F2566 /* DiagnosticsLog.swift */; };
+		C17C7B3D69FD78BAF6AE9A35 /* osm-raster-style.json in Resources */ = {isa = PBXBuildFile; fileRef = DF0CA0975EF971ECD4025A6D /* osm-raster-style.json */; };
 		D0FEE1870B651EE087BFA605 /* MapKitOverlayTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9025D21DB053012A2C31DDE /* MapKitOverlayTab.swift */; };
 		E0AD5AA32FE1BB3A3D1FB706 /* iOSMapsTestApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C58B7CF2B42091CE5FDF5CD /* iOSMapsTestApp.swift */; };
 		E33AECCFFDD483FF2CBFB477 /* MapLibre.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7AA724C61F31A2244D7FC3C /* MapLibre.xcframework */; };
@@ -65,6 +66,7 @@
 		B505A532E4C27392FBCDC559 /* iOSMapsTest.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = iOSMapsTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA2C09708D186F49E0CCAF3F /* DiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsView.swift; sourceTree = "<group>"; };
 		CDBEFE8F3CC7D72EDD53ABF9 /* TestContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestContent.swift; sourceTree = "<group>"; };
+		DF0CA0975EF971ECD4025A6D /* osm-raster-style.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "osm-raster-style.json"; sourceTree = "<group>"; };
 		E67C1554E04B43A241686B3A /* iOSMapsTestTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = iOSMapsTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF41EACB3018FB71285BDF02 /* test-polygon.geojson */ = {isa = PBXFileReference; path = "test-polygon.geojson"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -106,6 +108,7 @@
 			children = (
 				71195965B68327B5788658EA /* Assets.xcassets */,
 				343C5C31525960BBE1462DED /* leaflet.html */,
+				DF0CA0975EF971ECD4025A6D /* osm-raster-style.json */,
 				2455114A3CA2EEE9CBC12FE6 /* test-annotations.json */,
 				EF41EACB3018FB71285BDF02 /* test-polygon.geojson */,
 			);
@@ -250,6 +253,7 @@
 			files = (
 				6426D33A2E3E0E520DC9EEDA /* Assets.xcassets in Resources */,
 				80BFB3F134F0C9A7F20D6EE4 /* leaflet.html in Resources */,
+				C17C7B3D69FD78BAF6AE9A35 /* osm-raster-style.json in Resources */,
 				446E817D3F07019CC78F0ED9 /* test-annotations.json in Resources */,
 				9302ACFE872974301A7F37B2 /* test-polygon.geojson in Resources */,
 			);

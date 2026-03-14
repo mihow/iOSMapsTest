@@ -14,6 +14,7 @@ targets:
           - Resources/test-annotations.json
           - Resources/test-polygon.geojson
           - Resources/leaflet.html
+          - Resources/osm-raster-style.json
       - path: Sources/Resources/test-annotations.json
         type: file
         buildPhase: resources
@@ -21,6 +22,9 @@ targets:
         type: file
         buildPhase: resources
       - path: Sources/Resources/leaflet.html
+        type: file
+        buildPhase: resources
+      - path: Sources/Resources/osm-raster-style.json
         type: file
         buildPhase: resources
     dependencies:
