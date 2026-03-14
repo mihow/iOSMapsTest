@@ -5,7 +5,7 @@ struct MapLibreMetalTab: View {
     var body: some View {
         NavigationStack {
             MapLibreOGLContainerView()
-                .navigationTitle("ML OpenGL")
+                .navigationTitle("MapLibre GL")
                 .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -72,10 +72,10 @@ struct MapLibreOGLMapView: UIViewRepresentable {
         let styleURL: URL
         if let localURL = Bundle.main.url(forResource: "osm-raster-style", withExtension: "json") {
             styleURL = localURL
-            print("[MapLibre OGL] loading local style: \(localURL)")
+            print("[MapLibre] loading local style: \(localURL)")
         } else {
             styleURL = URL(string: "https://demotiles.maplibre.org/style.json")!
-            print("[MapLibre OGL] ⚠️ local style not found, falling back to demo tiles")
+            print("[MapLibre] ⚠️ local style not found, falling back to demo tiles")
         }
 
         let map = MLNMapView(frame: .zero, styleURL: styleURL)
@@ -93,13 +93,49 @@ struct MapLibreOGLMapView: UIViewRepresentable {
 
     final class Coordinator: NSObject, MLNMapViewDelegate {
         func mapViewDidFinishLoadingMap(_ mapView: MLNMapView) {
-            print("[MapLibre OGL] ✅ map loaded")
+            print("[MapLibre] ✅ map loaded")
         }
         func mapViewDidFailLoadingMap(_ mapView: MLNMapView, withError error: Error) {
-            print("[MapLibre OGL] ❌ \(error)")
+            print("[MapLibre] ❌ \(error)")
         }
         func mapView(_ mapView: MLNMapView, didFinishLoading style: MLNStyle) {
-            print("[MapLibre OGL] ✅ style: \(style.name ?? "?"), sources: \(style.sources.count)")
+            print("[MapLibre] ✅ style loaded, adding polygon overlay")
+            addPolygonOverlay(to: style)
+        }
+
+        private func addPolygonOverlay(to style: MLNStyle) {
+            guard let url = Bundle.main.url(forResource: "test-polygon", withExtension: "geojson"),
+                  let data = try? Data(contentsOf: url),
+                  let shape = try? MLNShape(data: data, encoding: String.Encoding.utf8.rawValue) else {
+                print("[MapLibre] ⚠️ could not load test-polygon.geojson")
+                return
+            }
+
+            let source = MLNShapeSource(identifier: "mt-hood-source", shape: shape, options: nil)
+            style.addSource(source)
+
+            // Fill layer
+            let fill = MLNFillStyleLayer(identifier: "mt-hood-fill", source: source)
+            fill.fillColor = NSExpression(forConstantValue: UIColor(red: 0.13, green: 0.55, blue: 0.13, alpha: 1))
+            fill.fillOpacity = NSExpression(forConstantValue: 0.25)
+            style.addLayer(fill)
+
+            // Stroke layer
+            let line = MLNLineStyleLayer(identifier: "mt-hood-line", source: source)
+            line.lineColor = NSExpression(forConstantValue: UIColor(red: 0, green: 0.39, blue: 0, alpha: 1))
+            line.lineWidth = NSExpression(forConstantValue: 2)
+            style.addLayer(line)
+
+            // Point annotation for summit
+            let point = MLNCircleStyleLayer(identifier: "mt-hood-point", source: source)
+            point.circleRadius = NSExpression(forConstantValue: 6)
+            point.circleColor = NSExpression(forConstantValue: UIColor.red)
+            point.circleStrokeWidth = NSExpression(forConstantValue: 2)
+            point.circleStrokeColor = NSExpression(forConstantValue: UIColor.white)
+            point.predicate = NSPredicate(format: "$geometryType = %@", "Point")
+            style.addLayer(point)
+
+            print("[MapLibre] ✅ polygon + summit marker added")
         }
     }
 }

@@ -13,6 +13,28 @@ var map = L.map("map", {zoomControl: false}).setView([45.5150, -122.6280], 10);
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap contributors"
 }).addTo(map);
+
+// Mt. Hood National Forest polygon
+var mtHoodNF = L.polygon([
+    [45.70, -122.10], [45.70, -121.50], [45.55, -121.45],
+    [45.40, -121.40], [45.25, -121.45], [45.15, -121.55],
+    [45.10, -121.75], [45.15, -121.90], [45.25, -122.05],
+    [45.40, -122.15], [45.55, -122.20], [45.70, -122.10]
+], {
+    color: "#006400",
+    weight: 2,
+    fillColor: "#228B22",
+    fillOpacity: 0.25
+}).addTo(map).bindPopup("Mt. Hood National Forest");
+
+// Mt. Hood summit marker
+L.circleMarker([45.3735, -121.6960], {
+    radius: 6,
+    color: "#fff",
+    weight: 2,
+    fillColor: "#f00",
+    fillOpacity: 1
+}).addTo(map).bindPopup("Mt. Hood — 11,250 ft");
 </script>
 </body>
 </html>

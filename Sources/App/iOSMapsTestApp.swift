@@ -14,7 +14,7 @@ struct iOSMapsTestApp: App {
 struct ContentView: View {
     let diagnostics: DiagnosticsLog
     @State private var showDiagnostics = false
-    @State private var selectedTab = 2  // Start on ML OpenGL tab
+    @State private var selectedTab = 2  // Start on MapLibre GL tab
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -25,7 +25,7 @@ struct ContentView: View {
                 .tabItem { Label("MK+Overlay", systemImage: "square.grid.3x3") }
                 .tag(1)
             MapLibreMetalTab()
-                .tabItem { Label("ML OpenGL", systemImage: "cpu") }
+                .tabItem { Label("MapLibre GL", systemImage: "cpu") }
                 .tag(2)
             LeafletTab()
                 .tabItem { Label("Leaflet", systemImage: "globe") }

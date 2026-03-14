@@ -4,18 +4,40 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Hawthorne District",
-        "description": "Test polygon — Portland, OR"
+        "name": "Mt. Hood National Forest",
+        "description": "Approximate boundary — visible at Portland zoom level",
+        "fill": "#228B22",
+        "fill-opacity": 0.25,
+        "stroke": "#006400",
+        "stroke-width": 2
       },
       "geometry": {
         "type": "Polygon",
         "coordinates": [[
-          [-122.6350, 45.5120],
-          [-122.6200, 45.5120],
-          [-122.6200, 45.5180],
-          [-122.6350, 45.5180],
-          [-122.6350, 45.5120]
+          [-122.10, 45.70],
+          [-121.50, 45.70],
+          [-121.45, 45.55],
+          [-121.40, 45.40],
+          [-121.45, 45.25],
+          [-121.55, 45.15],
+          [-121.75, 45.10],
+          [-121.90, 45.15],
+          [-122.05, 45.25],
+          [-122.15, 45.40],
+          [-122.20, 45.55],
+          [-122.10, 45.70]
         ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mt. Hood",
+        "description": "Summit — 11,250 ft"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.6960, 45.3735]
       }
     }
   ]
