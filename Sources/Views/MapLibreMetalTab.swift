@@ -14,8 +14,8 @@ struct MapLibreMetalTab: View {
 struct MapLibreOGLContainerView: View {
     @State private var mapView: MLNMapView?
 
-    private let overviewCenter = CLLocationCoordinate2D(latitude: 45.5150, longitude: -122.6280)
-    private let overviewZoom: Double = 10
+    private let overviewCenter = CLLocationCoordinate2D(latitude: 45.42, longitude: -122.05)
+    private let overviewZoom: Double = 8
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -81,8 +81,8 @@ struct MapLibreOGLMapView: UIViewRepresentable {
         let map = MLNMapView(frame: .zero, styleURL: styleURL)
         map.delegate = context.coordinator
         map.setCenter(
-            CLLocationCoordinate2D(latitude: 45.5150, longitude: -122.6280),
-            zoomLevel: 10,
+            CLLocationCoordinate2D(latitude: 45.42, longitude: -122.05),
+            zoomLevel: 8,
             animated: false
         )
         DispatchQueue.main.async { self.mapView = map }

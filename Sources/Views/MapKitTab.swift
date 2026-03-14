@@ -16,7 +16,7 @@ struct MapKitContainerView: View {
 
     private let overviewRegion = MKCoordinateRegion(
         center: TestContent.center,
-        span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+        span: MKCoordinateSpan(latitudeDelta: 2.0, longitudeDelta: 2.0)
     )
 
     var body: some View {
@@ -81,7 +81,7 @@ struct MapKitMapView: UIViewRepresentable {
         map.setRegion(
             MKCoordinateRegion(
                 center: TestContent.center,
-                span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+                span: MKCoordinateSpan(latitudeDelta: 2.0, longitudeDelta: 2.0)
             ),
             animated: false
         )

@@ -20,7 +20,7 @@ struct LeafletContainerView: View {
 
             VStack(spacing: 8) {
                 Button {
-                    webView?.evaluateJavaScript("map.setView([45.5150, -122.6280], 10);", completionHandler: nil)
+                    webView?.evaluateJavaScript("map.setView([45.42, -122.05], 8);", completionHandler: nil)
                 } label: {
                     Image(systemName: "location.fill")
                         .font(.title3)
