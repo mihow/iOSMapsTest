@@ -353,3 +353,32 @@ and the zip to `~/Projects/iOSMapsTest/MapLibre.static.xcframework.zip`.
 ### Next Step
 
 Proceed with Task 10: Integrate the OpenGL xcframework into the iOSMapsTest Swift project.
+
+---
+
+## MapLibre OpenGL — Integration Result (2026-03-13)
+
+**RESULT: ✅ SUCCESS — MapLibre renders full vector tiles via OpenGL ES in QEMU**
+
+### What was done
+1. Replaced SPM MapLibre Metal dependency with local OpenGL xcframework (Bazel-built `MapLibre.static`)
+2. Set Package.swift to use `.binaryTarget` pointing to `MapLibre.xcframework`
+3. Added `-ObjC` linker flag (required for ObjC categories in static frameworks)
+4. Copied `Mapbox.bundle` to app bundle root (required for resource lookup)
+5. App bundle structure: binary at root, `lib/MapLibre.framework/` for rpath, `Mapbox.bundle` at root
+
+### Screenshot evidence
+- World zoom (1.5): Colored country polygons, water, borders, labels — all rendered ✅
+- Style: demotiles.maplibre.org
+
+### Runtime environment
+- Metal: false (as expected in QEMU)
+- OpenGL ES 2.0: true
+- OpenGL ES 3.0: true
+
+### Key lessons
+- MapLibre.static xcframework = static archive (ar) linked into binary at build time
+- rpath `@executable_path/../lib` → framework at `AppName.app/lib/MapLibre.framework/`
+- `-ObjC` flag needed to pull in ObjC categories from static lib (mgl_frameworkBundle)
+- `Mapbox.bundle` must be at app bundle root for resource lookup
+- DiagnosticsLog `@Environment` issue: use parameter passing, not `@Environment`, for SPM executables

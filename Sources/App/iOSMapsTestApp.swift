@@ -6,55 +6,61 @@ struct iOSMapsTestApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TabView {
-                MapKitTab()
-                    .tabItem { Label("MapKit", systemImage: "map") }
-                MapKitOverlayTab()
-                    .tabItem { Label("MK+Overlay", systemImage: "square.grid.3x3") }
-                MapLibreMetalTab()
-                    .tabItem { Label("ML Metal", systemImage: "cpu") }
-                LeafletTab()
-                    .tabItem { Label("Leaflet", systemImage: "globe") }
-            }
-            .environment(diagnostics)
-            .overlay(alignment: .bottom) {
-                DiagnosticsOverlay()
-            }
-            .onAppear {
-                print("=== GPU CAPABILITIES ===")
-                print("Metal: \(diagnostics.metalAvailable)")
-                print("OpenGL ES 2.0: \(diagnostics.openGLES2Available)")
-                print("OpenGL ES 3.0: \(diagnostics.openGLES3Available)")
-                print("========================")
-            }
+            ContentView(diagnostics: diagnostics)
         }
     }
 }
 
-struct DiagnosticsOverlay: View {
-    @Environment(DiagnosticsLog.self) private var log
+struct ContentView: View {
+    let diagnostics: DiagnosticsLog
     @State private var showDiagnostics = false
+    @State private var selectedTab = 2  // Start on ML OpenGL tab
 
     var body: some View {
-        VStack {
-            Spacer()
-            Button {
-                showDiagnostics.toggle()
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "stethoscope")
-                    Text("\(log.entries.count)")
-                        .font(.caption)
+        TabView(selection: $selectedTab) {
+            MapKitTab()
+                .tabItem { Label("MapKit", systemImage: "map") }
+                .tag(0)
+            MapKitOverlayTab()
+                .tabItem { Label("MK+Overlay", systemImage: "square.grid.3x3") }
+                .tag(1)
+            MapLibreMetalTab()
+                .tabItem { Label("ML OpenGL", systemImage: "cpu") }
+                .tag(2)
+            LeafletTab()
+                .tabItem { Label("Leaflet", systemImage: "globe") }
+                .tag(3)
+        }
+        .environment(diagnostics)
+        .overlay(alignment: .bottom) {
+            VStack {
+                Spacer()
+                Button {
+                    showDiagnostics.toggle()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "stethoscope")
+                        Text("\(diagnostics.entries.count)")
+                            .font(.caption)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(.ultraThinMaterial)
-                .clipShape(Capsule())
+                .padding(.bottom, 60)
             }
-            .padding(.bottom, 60)
-            .sheet(isPresented: $showDiagnostics) {
-                DiagnosticsView()
-            }
+        }
+        .sheet(isPresented: $showDiagnostics) {
+            DiagnosticsView()
+                .environment(diagnostics)
+        }
+        .onAppear {
+            print("=== GPU CAPABILITIES ===")
+            print("Metal: \(diagnostics.metalAvailable)")
+            print("OpenGL ES 2.0: \(diagnostics.openGLES2Available)")
+            print("OpenGL ES 3.0: \(diagnostics.openGLES3Available)")
+            print("========================")
         }
     }
 }
