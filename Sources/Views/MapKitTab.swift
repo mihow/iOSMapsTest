@@ -85,6 +85,7 @@ struct MapKitMapView: UIViewRepresentable {
             ),
             animated: false
         )
+        addPolygonOverlay(to: map)
         print("[MapKit] MKMapView created")
         DispatchQueue.main.async { self.mapView = map }
         return map
@@ -92,7 +93,44 @@ struct MapKitMapView: UIViewRepresentable {
 
     func updateUIView(_ uiView: MKMapView, context: Context) {}
 
+    private func addPolygonOverlay(to map: MKMapView) {
+        let coords: [CLLocationCoordinate2D] = [
+            CLLocationCoordinate2D(latitude: 45.70, longitude: -122.10),
+            CLLocationCoordinate2D(latitude: 45.70, longitude: -121.50),
+            CLLocationCoordinate2D(latitude: 45.55, longitude: -121.45),
+            CLLocationCoordinate2D(latitude: 45.40, longitude: -121.40),
+            CLLocationCoordinate2D(latitude: 45.25, longitude: -121.45),
+            CLLocationCoordinate2D(latitude: 45.15, longitude: -121.55),
+            CLLocationCoordinate2D(latitude: 45.10, longitude: -121.75),
+            CLLocationCoordinate2D(latitude: 45.15, longitude: -121.90),
+            CLLocationCoordinate2D(latitude: 45.25, longitude: -122.05),
+            CLLocationCoordinate2D(latitude: 45.40, longitude: -122.15),
+            CLLocationCoordinate2D(latitude: 45.55, longitude: -122.20),
+            CLLocationCoordinate2D(latitude: 45.70, longitude: -122.10),
+        ]
+        let polygon = MKPolygon(coordinates: coords, count: coords.count)
+        polygon.title = "Mt. Hood National Forest"
+        map.addOverlay(polygon)
+
+        let summit = MKPointAnnotation()
+        summit.coordinate = CLLocationCoordinate2D(latitude: 45.3735, longitude: -121.6960)
+        summit.title = "Mt. Hood"
+        summit.subtitle = "11,250 ft"
+        map.addAnnotation(summit)
+        print("[MapKit] polygon + summit annotation added")
+    }
+
     final class Coordinator: NSObject, MKMapViewDelegate {
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            if let polygon = overlay as? MKPolygon {
+                let renderer = MKPolygonRenderer(polygon: polygon)
+                renderer.fillColor = UIColor(red: 0.13, green: 0.55, blue: 0.13, alpha: 0.25)
+                renderer.strokeColor = UIColor(red: 0, green: 0.39, blue: 0, alpha: 1)
+                renderer.lineWidth = 2
+                return renderer
+            }
+            return MKOverlayRenderer(overlay: overlay)
+        }
         func mapViewDidFinishLoadingMap(_ mapView: MKMapView) {
             print("[MapKit] ✅ mapViewDidFinishLoadingMap")
         }

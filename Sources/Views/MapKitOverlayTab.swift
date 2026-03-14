@@ -78,9 +78,12 @@ struct MapKitOverlayMapView: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
         let map = MKMapView(frame: .zero)
         map.delegate = context.coordinator
-        let overlay = MKTileOverlay(urlTemplate: TestContent.osmTileURL)
-        overlay.canReplaceMapContent = true
-        map.addOverlay(overlay, level: .aboveLabels)
+
+        // OSM tile overlay
+        let tileOverlay = MKTileOverlay(urlTemplate: TestContent.osmTileURL)
+        tileOverlay.canReplaceMapContent = true
+        map.addOverlay(tileOverlay, level: .aboveLabels)
+
         map.setRegion(
             MKCoordinateRegion(
                 center: TestContent.center,
@@ -88,6 +91,8 @@ struct MapKitOverlayMapView: UIViewRepresentable {
             ),
             animated: false
         )
+
+        addPolygonOverlay(to: map)
         print("[MK+Overlay] MKMapView + MKTileOverlay created")
         DispatchQueue.main.async { self.mapView = map }
         return map
@@ -95,12 +100,44 @@ struct MapKitOverlayMapView: UIViewRepresentable {
 
     func updateUIView(_ uiView: MKMapView, context: Context) {}
 
+    private func addPolygonOverlay(to map: MKMapView) {
+        let coords: [CLLocationCoordinate2D] = [
+            CLLocationCoordinate2D(latitude: 45.70, longitude: -122.10),
+            CLLocationCoordinate2D(latitude: 45.70, longitude: -121.50),
+            CLLocationCoordinate2D(latitude: 45.55, longitude: -121.45),
+            CLLocationCoordinate2D(latitude: 45.40, longitude: -121.40),
+            CLLocationCoordinate2D(latitude: 45.25, longitude: -121.45),
+            CLLocationCoordinate2D(latitude: 45.15, longitude: -121.55),
+            CLLocationCoordinate2D(latitude: 45.10, longitude: -121.75),
+            CLLocationCoordinate2D(latitude: 45.15, longitude: -121.90),
+            CLLocationCoordinate2D(latitude: 45.25, longitude: -122.05),
+            CLLocationCoordinate2D(latitude: 45.40, longitude: -122.15),
+            CLLocationCoordinate2D(latitude: 45.55, longitude: -122.20),
+            CLLocationCoordinate2D(latitude: 45.70, longitude: -122.10),
+        ]
+        let polygon = MKPolygon(coordinates: coords, count: coords.count)
+        polygon.title = "Mt. Hood National Forest"
+        map.addOverlay(polygon)
+
+        let summit = MKPointAnnotation()
+        summit.coordinate = CLLocationCoordinate2D(latitude: 45.3735, longitude: -121.6960)
+        summit.title = "Mt. Hood"
+        summit.subtitle = "11,250 ft"
+        map.addAnnotation(summit)
+        print("[MK+Overlay] polygon + summit annotation added")
+    }
+
     final class Coordinator: NSObject, MKMapViewDelegate {
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-            if let tile = overlay as? MKTileOverlay {
-                let renderer = MKTileOverlayRenderer(tileOverlay: tile)
-                print("[MK+Overlay] ✅ tile renderer created")
+            if let polygon = overlay as? MKPolygon {
+                let renderer = MKPolygonRenderer(polygon: polygon)
+                renderer.fillColor = UIColor(red: 0.13, green: 0.55, blue: 0.13, alpha: 0.25)
+                renderer.strokeColor = UIColor(red: 0, green: 0.39, blue: 0, alpha: 1)
+                renderer.lineWidth = 2
                 return renderer
+            }
+            if let tile = overlay as? MKTileOverlay {
+                return MKTileOverlayRenderer(tileOverlay: tile)
             }
             return MKOverlayRenderer(overlay: overlay)
         }
