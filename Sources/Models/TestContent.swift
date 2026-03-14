@@ -19,7 +19,7 @@ enum TestContent {
     static let osmTileURL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 
     static func loadAnnotations() -> [TestAnnotation] {
-        guard let url = Bundle.module.url(forResource: "test-annotations", withExtension: "json"),
+        guard let url = Bundle.main.url(forResource: "test-annotations", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let annotations = try? JSONDecoder().decode([TestAnnotation].self, from: data) else {
             return []
@@ -28,7 +28,7 @@ enum TestContent {
     }
 
     static func loadPolygonGeoJSON() -> Data? {
-        guard let url = Bundle.module.url(forResource: "test-polygon", withExtension: "geojson") else {
+        guard let url = Bundle.main.url(forResource: "test-polygon", withExtension: "geojson") else {
             return nil
         }
         return try? Data(contentsOf: url)
