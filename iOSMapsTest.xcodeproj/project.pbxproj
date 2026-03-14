@@ -12,6 +12,7 @@
 		3F350B1BF03F4374225AC25B /* LeafletTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38F917F0D78FD1C2F83CA9A4 /* LeafletTab.swift */; };
 		446E817D3F07019CC78F0ED9 /* test-annotations.json in Resources */ = {isa = PBXBuildFile; fileRef = 2455114A3CA2EEE9CBC12FE6 /* test-annotations.json */; };
 		6426D33A2E3E0E520DC9EEDA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71195965B68327B5788658EA /* Assets.xcassets */; };
+		80BFB3F134F0C9A7F20D6EE4 /* leaflet.html in Resources */ = {isa = PBXBuildFile; fileRef = 343C5C31525960BBE1462DED /* leaflet.html */; };
 		873FA2E0D39AED49B08F52FE /* MapLibreMetalTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACBE63D5C475646AE7CBE5B /* MapLibreMetalTab.swift */; };
 		9302ACFE872974301A7F37B2 /* test-polygon.geojson in Resources */ = {isa = PBXBuildFile; fileRef = EF41EACB3018FB71285BDF02 /* test-polygon.geojson */; };
 		B5732B3EBB6B8CFD1F86FA96 /* DiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA2C09708D186F49E0CCAF3F /* DiagnosticsView.swift */; };
@@ -52,6 +53,7 @@
 		0D513E446C1494870E4F2566 /* DiagnosticsLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsLog.swift; sourceTree = "<group>"; };
 		1891D362CA2FAA81FF2455D3 /* MapKitTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapKitTab.swift; sourceTree = "<group>"; };
 		2455114A3CA2EEE9CBC12FE6 /* test-annotations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "test-annotations.json"; sourceTree = "<group>"; };
+		343C5C31525960BBE1462DED /* leaflet.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = leaflet.html; sourceTree = "<group>"; };
 		38F917F0D78FD1C2F83CA9A4 /* LeafletTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeafletTab.swift; sourceTree = "<group>"; };
 		5ACBE63D5C475646AE7CBE5B /* MapLibreMetalTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapLibreMetalTab.swift; sourceTree = "<group>"; };
 		6C58B7CF2B42091CE5FDF5CD /* iOSMapsTestApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSMapsTestApp.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				71195965B68327B5788658EA /* Assets.xcassets */,
+				343C5C31525960BBE1462DED /* leaflet.html */,
 				2455114A3CA2EEE9CBC12FE6 /* test-annotations.json */,
 				EF41EACB3018FB71285BDF02 /* test-polygon.geojson */,
 			);
@@ -246,6 +249,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6426D33A2E3E0E520DC9EEDA /* Assets.xcassets in Resources */,
+				80BFB3F134F0C9A7F20D6EE4 /* leaflet.html in Resources */,
 				446E817D3F07019CC78F0ED9 /* test-annotations.json in Resources */,
 				9302ACFE872974301A7F37B2 /* test-polygon.geojson in Resources */,
 			);

@@ -13,10 +13,14 @@ targets:
         excludes:
           - Resources/test-annotations.json
           - Resources/test-polygon.geojson
+          - Resources/leaflet.html
       - path: Sources/Resources/test-annotations.json
         type: file
         buildPhase: resources
       - path: Sources/Resources/test-polygon.geojson
+        type: file
+        buildPhase: resources
+      - path: Sources/Resources/leaflet.html
         type: file
         buildPhase: resources
     dependencies:
