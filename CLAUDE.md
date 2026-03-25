@@ -43,7 +43,7 @@ xcodegen generate
 xcodebuild -project iOSMapsTest.xcodeproj \
   -scheme iOSMapsTest \
   -sdk iphonesimulator \
-  -destination "platform=iOS Simulator,name=iPhone SE (3rd generation)" \
+  -destination "platform=iOS Simulator,name=iPhone 16e" \
   test
 ```
 
